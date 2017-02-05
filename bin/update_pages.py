@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 """
-Update wiki pages.
+Actualizar páginas de la wiki
 
-This script is used to update scp-wiki tale hubs and other such pages.
+Este script se utiliza para actualizar los hubs de cuentos de la wiki-scp y otras páginas similares.
 """
 
 ###############################################################################
-# Module Imports
+# Importar modulos
 ###############################################################################
 
 import arrow
@@ -86,8 +86,8 @@ class Updater:
 
 class TaleUpdater(Updater):
 
-    HEADER = '||~ Title||~ Author||~ Created||'
-    NODATA = '||||||= **NO DATA AVAILABLE**||'
+    HEADER = '||~ Título||~ Autor||~ Creado||'
+    NODATA = '||||||= **DATOS NO DISPONIBLE**||'
 
     def format_page(self, page=None):
         return '||[[[{}|]]]||{}||//{}//||\n||||||{}||'.format(
@@ -96,7 +96,7 @@ class TaleUpdater(Updater):
 
     def update(self, target):
         targets = [
-            'component:tales-by-{}-{}'.format(target, i + 1) for i in range(4)]
+            'component:relatos-por-{}-{}'.format(target, i + 1) for i in range(4)]
         super().update(*targets)
 
 
@@ -138,11 +138,11 @@ class TalesByDate(TaleUpdater):
 
     def disp(self):
         return [
-            arrow.get(i, 'YYYY-MM').format('MMMM YYYY') for i in self.keys()]
+            arrow.get(i, 'AAAA-MM').format('MMMM AAAA') for i in self.keys()]
 
     def keys(self):
-        return [i.format('YYYY-MM') for i in
-                arrow.Arrow.range('month', arrow.get('2008-07'), arrow.now())]
+        return [i.format('AAAA-MM') for i in
+                arrow.Arrow.range('mes', arrow.get('2008-07'), arrow.now())]
 
     def keyfunc(self, page=None):
         return page.created[:7]
@@ -153,7 +153,7 @@ class TalesByDate(TaleUpdater):
 
 def update_tale_hubs(wiki):
     pages = list(wiki.list_pages(
-        tags='tale -hub -_sys',
+        tags='relato -hub -_sys',
         body='title created_by created_at preview tags'))
     TalesByTitle(wiki, pages).update('title')
     TalesByAuthor(wiki, pages).update('author')
@@ -165,7 +165,7 @@ def update_tale_hubs(wiki):
 class CreditUpdater(Updater):
 
     HEADER = ''
-    NODATA = '||||= **NO DATA AVAILABLE**||'
+    NODATA = '||||= **DATOS NO DISPONIBLE**||'
 
     def format_page(self, page):
         return '||[[[{}|{}]]]||{}||'.format(
@@ -207,21 +207,21 @@ class SeriesCredits(CreditUpdater):
 class MiscCredits(CreditUpdater):
 
     def __init__(self, wiki, pages):
-        self.proposals = pyscp.wikidot.Wiki('scp-wiki')('scp-001').links
+        self.proposals = pyscp.wikidot.Wiki('lafundacionscp')('scp-001').links
         super().__init__(wiki, pages)
 
     def keys(self):
-        return 'proposals explained joke archived'.split()
+        return 'propuesta explicado humorístico archivado'.split()
 
     def disp(self):
         return [
-            '001 Proposals', 'Explained Phenomena',
-            'Joke Articles', 'Archived Articles']
+            'propuesta 001', 'Fenomeno Explicado',
+            'Artículos Humorísticos', 'Artículos Archivados']
 
     def keyfunc(self, page):
         if page.url in self.proposals:
             return 'proposals'
-        for tag in ('explained', 'joke', 'archived'):
+        for tag in ('explicado', 'humorístico', 'archivado'):
             if tag in page.tags:
                 return tag
 
@@ -240,7 +240,7 @@ def update_credit_hubs(wiki):
 
 ###############################################################################
 
-wiki = pyscp.wikidot.Wiki('scp-wiki')
+wiki = pyscp.wikidot.Wiki('lafundacionscp')
 with open('pyscp_bot.pass') as file:
     wiki.auth('jarvis-bot', file.read())
 
