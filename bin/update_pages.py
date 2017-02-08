@@ -230,7 +230,7 @@ def update_credit_hubs(wiki):
     pages = list(wiki.list_pages(
         tag='scp', body='title created_by tags'))
     wiki = pyscp.wikidot.Wiki('borradores-scp-es')
-    with open('Goodguy34'):
+    with open('pyscp_paco.pass') as file:
         wiki.auth('PanchoBot', file.read())
 
     SeriesCredits(wiki, pages, 1).update('series1')
@@ -241,7 +241,7 @@ def update_credit_hubs(wiki):
 ###############################################################################
 
 wiki = pyscp.wikidot.Wiki('lafundacionscp')
-with open(") as file:
+with open('pyscp_paco.pass') as file:
     wiki.auth('PanchoBot', file.read())
 
 pyscp.utils.default_logging()
