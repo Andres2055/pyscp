@@ -230,8 +230,8 @@ def update_credit_hubs(wiki):
     pages = list(wiki.list_pages(
         tag='scp', body='title created_by tags'))
     wiki = pyscp.wikidot.Wiki('scpsandbox2')
-    with open('pyscp_bot.pass') as file:
-        wiki.auth('jarvis-bot', file.read())
+    with open('botguy34') as file:
+        wiki.auth('Pancho_Bot', file.read())
 
     SeriesCredits(wiki, pages, 1).update('series1')
     SeriesCredits(wiki, pages, 2).update('series2')
@@ -241,8 +241,8 @@ def update_credit_hubs(wiki):
 ###############################################################################
 
 wiki = pyscp.wikidot.Wiki('lafundacionscp')
-with open('pyscp_bot.pass') as file:
-    wiki.auth('jarvis-bot', file.read())
+with open('botguy34') as file:
+    wiki.auth('Pancho_Bot', file.read())
 
 pyscp.utils.default_logging()
 #update_credit_hubs(wiki)
