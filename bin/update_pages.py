@@ -241,7 +241,7 @@ def update_credit_hubs(wiki):
 ###############################################################################
 
 wiki = pyscp.wikidot.Wiki('lafundacionscp')
-with open('Goodguy34') as file:
+with open('Goodguy34'):
     wiki.auth('PanchoBot', file.read())
 
 pyscp.utils.default_logging()
