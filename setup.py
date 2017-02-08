@@ -5,12 +5,14 @@ with open('README.md') as f:
 
 setuptools.setup(
     name='pyscp',
-    version='1.0.18',
+    version='1.0.18es',
     description='Python API and utilities for the scp-wiki.net website.',
     long_description=readme,
-    url='https://github.com/anqxyr/pyscp/',
+    url='https://github.com/andres2055/pyscp/tree/Espanish',
     author='anqxyr',
+    translator='andres2055',
     author_email='anqxyr@gmail.com',
+    translator_email='andrecito104@hotmail.com',
     license='MIT',
     classifiers=[
         'Development Status :: 4 - Beta',
