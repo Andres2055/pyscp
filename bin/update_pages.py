@@ -96,7 +96,7 @@ class TaleUpdater(Updater):
 
     def update(self, target):
         targets = [
-            'component:relatos-por-{}-{}'.format(target, i + 1) for i in range(4)]
+            'component:tales-by-{}-{}'.format(target, i + 1) for i in range(4)]
         super().update(*targets)
 
 
@@ -229,8 +229,8 @@ class MiscCredits(CreditUpdater):
 def update_credit_hubs(wiki):
     pages = list(wiki.list_pages(
         tag='scp', body='title created_by tags'))
-    wiki = pyscp.wikidot.Wiki('scpsandbox2')
-    with open('Goodguy34') as file:
+    wiki = pyscp.wikidot.Wiki('borradores-scp-es')
+    with open('Goodguy34'):
         wiki.auth('PanchoBot', file.read())
 
     SeriesCredits(wiki, pages, 1).update('series1')
