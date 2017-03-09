@@ -176,8 +176,8 @@ class Page(pyscp.core.Page):
     @property
     def created(self):
         if 'created_at' in self._body:
-            time = arrow.get(self._body['created_at'], 'DD MMM YYYY HH:mm')
-            return time.format('YYYY-MM-DD HH:mm:ss')
+            time = arrow.get(self._body['created_at'], 'DD MMM AAAA HH:mm')
+            return time.format('AAAA-MM-DD HH:mm:ss')
         return super().created
 
     @property
@@ -450,9 +450,9 @@ class Wiki(pyscp.core.Wiki):
     @functools.lru_cache(maxsize=1)
     @pyscp.utils.listify()
     def list_images(self):
-        if 'scp-wiki' not in self.site:
+        if 'lafundacionscp' not in self.site:
             return
-        base = 'http://scpsandbox2.wikidot.com/image-review-{}'
+        base = 'http://borradores-scp-es.wikidot.com/image-review-{}'
         urls = [base.format(i) for i in range(1, 36)]
         pages = [self.req.get(u).text for u in urls]
         soups = [bs4.BeautifulSoup(p, 'lxml') for p in pages]
@@ -479,7 +479,7 @@ def parse_element_id(element):
 def parse_element_time(element):
     """Extract and format time from an html element."""
     unixtime = element.find(class_='odate')['class'][1].split('_')[1]
-    return arrow.get(unixtime).format('YYYY-MM-DD HH:mm:ss')
+    return arrow.get(unixtime).format('AAAA-MM-DD HH:mm:ss')
 
 
 def crawl_posts(post_containers, parent=None):
@@ -495,3 +495,5 @@ def crawl_posts(post_containers, parent=None):
         yield from crawl_posts(
             container(class_='post-container', recursive=False),
             int(container['id'].split('-')[1]))
+
+
