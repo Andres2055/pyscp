@@ -222,7 +222,7 @@ class SnapshotCreator:
         self._save_all_pages()
         if forums:
             self._save_forums()
-        if 'scp-wiki' in self.wiki.site:
+        if 'lafundacionscp' in self.wiki.site:
             self._save_meta()
         orm.queue.join()
         self._save_cache()
@@ -236,7 +236,7 @@ class SnapshotCreator:
             'PageTag', 'ForumThread', 'User', 'Tag')
         count = next(
             self.wiki.list_pages(body='total', limit=1))._body['total']
-        bar = utils.ProgressBar('SAVING PAGES'.ljust(20), int(count))
+        bar = utils.ProgressBar('Guardando Página'.ljust(20), int(count))
         bar.start()
         for _ in self.pool.map(self._save_page, self.wiki.list_pages()):
             bar.value += 1
@@ -273,7 +273,7 @@ class SnapshotCreator:
             title=c.title,
             description=c.description) for c in cats)
         total_size = sum(c.size for c in cats)
-        bar = utils.ProgressBar('SAVING FORUM THREADS', total_size)
+        bar = utils.ProgressBar('GUARDANDO HILO DEL FORO', total_size)
         bar.start()
         for cat in cats:
             threads = set(self.wiki.list_threads(cat.id))
@@ -294,10 +294,10 @@ class SnapshotCreator:
         orm.create_tables(
             'Image', 'ImageStatus')
         licenses = {
-            'PERMISSION GRANTED', 'BY-NC-SA CC', 'BY-SA CC', 'PUBLIC DOMAIN'}
+            'PERMISO GARANTIZÁDO', 'BY-NC-SA CC', 'BY-SA CC', 'DOMINIO PÚBLICO'}
         images = [i for i in self.wiki.list_images() if i.status in licenses]
         self.ibar = utils.ProgressBar(
-            'SAVING IMAGES'.ljust(20), len(images))
+            'GUARDANDO IMÁGEN'.ljust(20), len(images))
         self.ibar.start()
         data = list(self.pool.map(self._save_image, images))
         self.ibar.stop()
@@ -310,7 +310,7 @@ class SnapshotCreator:
     def _save_image(self, image):
         self.ibar.value += 1
         if not image.source:
-            log.info('Image source not specified: ' + image.url)
+            log.info('Dirección de la imágen no especificado: ' + image.url)
             return
         return self.wiki.req.get(image.url, allow_redirects=True).content
 
