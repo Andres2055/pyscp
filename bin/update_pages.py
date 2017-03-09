@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 """
-Actualizar páginas de la wiki
+Update wiki pages.
 
-Este script se utiliza para actualizar los hubs de cuentos de la wiki-scp y otras páginas similares.
+This script is used to update scp-wiki tale hubs and other such pages.
 """
 
 ###############################################################################
-# Importar modulos
+# Module Imports
 ###############################################################################
 
 import arrow
@@ -78,7 +78,7 @@ class Updater:
         for idx, target in enumerate(targets):
             source = output[idx] if idx < len(output) else ''
             self.wiki(target).revert(0)
-            self.wiki(target).edit(source, comment='automated update')
+            self.wiki(target).edit(source, comment='Actualización automática')
             log.info('{} {}'.format(target, len(source)))
 
 ###############################################################################
@@ -87,7 +87,7 @@ class Updater:
 class TaleUpdater(Updater):
 
     HEADER = '||~ Título||~ Autor||~ Creado||'
-    NODATA = '||||||= **DATOS NO DISPONIBLE**||'
+    NODATA = '||||||= **NO DATA AVAILABLE**||'
 
     def format_page(self, page=None):
         return '||[[[{}|]]]||{}||//{}//||\n||||||{}||'.format(
@@ -142,7 +142,7 @@ class TalesByDate(TaleUpdater):
 
     def keys(self):
         return [i.format('AAAA-MM') for i in
-                arrow.Arrow.range('mes', arrow.get('2008-07'), arrow.now())]
+                arrow.Arrow.range('month', arrow.get('2008-07'), arrow.now())]
 
     def keyfunc(self, page=None):
         return page.created[:7]
@@ -165,7 +165,7 @@ def update_tale_hubs(wiki):
 class CreditUpdater(Updater):
 
     HEADER = ''
-    NODATA = '||||= **DATOS NO DISPONIBLE**||'
+    NODATA = '||||= **DATOS NO DISPONIBLES**||'
 
     def format_page(self, page):
         return '||[[[{}|{}]]]||{}||'.format(
@@ -183,7 +183,7 @@ class CreditUpdater(Updater):
         return title
 
     def update(self, target):
-        super().update('component:credits-' + target)
+        super().update('component:creditos-' + target)
 
 
 class SeriesCredits(CreditUpdater):
@@ -207,20 +207,20 @@ class SeriesCredits(CreditUpdater):
 class MiscCredits(CreditUpdater):
 
     def __init__(self, wiki, pages):
-        self.proposals = pyscp.wikidot.Wiki('lafundacionscp')('scp-001').links
+        self.proposals = pyscp.wikidot.Wiki('lafundacionscp')('scp-es-001').links
         super().__init__(wiki, pages)
 
     def keys(self):
-        return 'propuesta explicado humorístico archivado'.split()
+        return 'propuesta explicado humorístico archivadp'.split()
 
     def disp(self):
         return [
-            'propuesta 001', 'Fenomeno Explicado',
-            'Artículos Humorísticos', 'Artículos Archivados']
+            'Propuesta 001', 'Fenonemo Explicado',
+            'Artículo Humorístico', 'Artículo Archivado']
 
     def keyfunc(self, page):
         if page.url in self.proposals:
-            return 'proposals'
+            return 'propuesta'
         for tag in ('explicado', 'humorístico', 'archivado'):
             if tag in page.tags:
                 return tag
@@ -231,7 +231,7 @@ def update_credit_hubs(wiki):
         tag='scp', body='title created_by tags'))
     wiki = pyscp.wikidot.Wiki('borradores-scp-es')
     with open('pyscp_bot.pass') as file:
-        wiki.auth('PanchoBot', file.read())
+        wiki.auth('Pancho_Bot', file.read())
 
     SeriesCredits(wiki, pages, 1).update('series1')
     SeriesCredits(wiki, pages, 2).update('series2')
@@ -240,9 +240,9 @@ def update_credit_hubs(wiki):
 
 ###############################################################################
 
-wiki = pyscp.wikidot.Wiki('lafundacionscp')
+wiki = pyscp.wikidot.Wiki('scp-wiki')
 with open('pyscp_bot.pass') as file:
-    wiki.auth('PanchoBot', file.read())
+    wiki.auth('Pancho_Bot'), file.read())
 
 pyscp.utils.default_logging()
 #update_credit_hubs(wiki)
