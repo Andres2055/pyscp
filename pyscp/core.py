@@ -277,13 +277,13 @@ class Page(metaclass=abc.ABCMeta):
         """
         Indicate whether the page is a mainlist scp article.
 
-        This is an scp-wiki exclusive property.
+        This is an lafundacionscp exclusive property.
         """
-        if 'scp-wiki' not in self._wiki.site:
+        if 'lafundacionscp' not in self._wiki.site:
             return False
         if 'scp' not in self.tags:
             return False
-        return bool(re.search(r'/scp-[0-9]{3,4}$', self.url))
+        return bool(re.search(r'/scp-es-[0-9]{3,4}$', self.url))
 
     ###########################################################################
     # Methods
@@ -299,7 +299,7 @@ class Page(metaclass=abc.ABCMeta):
         formatted, human-readable description of who was and is involved with
         the page, and in what role.
         """
-        roles = 'author rewrite translator maintainer'.split()
+        roles = 'autor reescritor traductor mantenimiento'.split()
 
         if not templates:
             templates = {i: '{{user}} ({})'.format(i) for i in roles}
@@ -395,13 +395,13 @@ class Wiki(metaclass=abc.ABCMeta):
         """
         List page ownership metadata.
 
-        This method is exclusive to the scp-wiki, and is used to fine-tune
+        This method is exclusive to the lafundacionscp, and is used to fine-tune
         the page ownership information beyond what is possible with Wikidot.
         This allows a single page to have an author different from the user
         who created the zeroth revision of the page, or even have multiple
         users attached to the page in various roles.
         """
-        if 'scp-wiki' not in self.site:
+        if 'lafundacionscp' not in self.site:
             return []
         soup = self('attribution-metadata')._soup
         results = []
@@ -414,8 +414,8 @@ class Wiki(metaclass=abc.ABCMeta):
 
     def _update_titles(self):
         for name in (
-                'scp-series', 'scp-series-2', 'scp-series-3',
-                'joke-scps', 'scp-ex', 'archived-scps'):
+                'serie-scp', 'serie-scp-2', 'serie-scp-3',
+                'scps-humorísticos', 'scp-ex', 'scps-archivados'):
             page = self(name)
             try:
                 soup = page._soup
@@ -428,7 +428,7 @@ class Wiki(metaclass=abc.ABCMeta):
     @functools.lru_cache(maxsize=1)
     def titles(self):
         """Dict of url/title pairs for scp articles."""
-        if 'scp-wiki' not in self.site:
+        if 'lafundacionscp' not in self.site:
             return {}
 
         self._update_titles()
@@ -450,7 +450,7 @@ class Wiki(metaclass=abc.ABCMeta):
             except (ValueError, TypeError):
                 continue
 
-            if title != '[ACCESS DENIED]':
+            if title != '[ACCESO DENEGADO]':
                 url2 = self.site + '/' + skip.lower()
                 titles[url1] = titles[url2] = title
 
