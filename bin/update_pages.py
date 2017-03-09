@@ -240,7 +240,7 @@ def update_credit_hubs(wiki):
 
 ###############################################################################
 
-wiki = pyscp.wikidot.Wiki('scp-wiki')
+wiki = pyscp.wikidot.Wiki('lafundacionscp')
 with open('pyscp_bot.pass') as file:
     wiki.auth('Pancho_Bot'), file.read())
 
