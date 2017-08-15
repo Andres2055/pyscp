@@ -17,18 +17,18 @@ import pyscp.stats.scalars as sc
 
 
 def tag(pages, tag):
-    """Pages with a given tag."""
+    """Páginas con una etiqueta dada."""
     if not tag:
         return pages
     return [p for p in pages if tag in p.tags]
 
 
 def user(pages, user):
-    """Pages by a certain user."""
+    """Páginas por un cierto usuario."""
     return [p for p in pages if p.author == user]
 
 
-# TODO: needs more indicative name.
+# TODO: necesito un nombre más indicativo.
 def min_authored(pages, min_val=3):
     """Pages by authors who have at least min_val pages."""
     authors = cn.author(pages, sc.count)
