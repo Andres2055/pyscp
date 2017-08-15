@@ -7,7 +7,7 @@ Take a list of pages and a scalar, and return a collections.Counter instance.
 """
 
 ###############################################################################
-# Imports
+# Importaciones
 ###############################################################################
 
 import collections
@@ -17,7 +17,7 @@ import re
 
 
 def make_counter(pages, func, key):
-    """Generic counter factory."""
+    """Constructor de contador genérico."""
     subgroups = collections.defaultdict(list)
     for p in pages:
         key_value = key(p)
@@ -27,17 +27,17 @@ def make_counter(pages, func, key):
 
 
 def author(pages, func):
-    """Group per page author."""
+    """Agrupa por página de autor."""
     return make_counter(pages, func, lambda p: p.author)
 
 
 def month(pages, func):
-    """Group per month the page was posted on."""
+    """Agrupa por el mes en que la página fue posteado."""
     return make_counter(pages, func, lambda p: p.created[:7])
 
 
 def page(pages, func):
-    """Each page into its own group."""
+    """Cada página en su propio grupo."""
     return make_counter(pages, func, lambda p: p.url)
 
 
@@ -57,7 +57,7 @@ def block(pages, func):
 
 
 def chain(pages, func, *counters):
-    """Apply counters one after another."""
+    """Aplicar contadores uno detras de otro."""
     if len(counters) == 1:
         return counters[0](pages, func)
     results = collections.Counter()
