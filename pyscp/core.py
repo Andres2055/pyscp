@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Abstract Base Classes.
+
+Clases Base de Abstracción
 
 pyscp builds most of its functionality on top of three large classes: Wiki,
 Page, and Thread. This module contains the abstract base classes for those
@@ -18,7 +19,7 @@ three core classes, such as Revision or Vote.
 
 
 ###############################################################################
-# Module Imports
+# Modulos Importados
 ###############################################################################
 
 import abc
@@ -34,14 +35,14 @@ import urllib.parse
 import pyscp.utils
 
 ###############################################################################
-# Global Constants And Variables
+# Constantes Globales Y Variables
 ###############################################################################
 
 logbook.FileHandler('pyscp.log').push_application()
 log = logbook.Logger(__name__)
 
 ###############################################################################
-# Abstract Base Classes
+# Clases Base de Abstracción
 ###############################################################################
 
 
@@ -88,7 +89,7 @@ class Page(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _pdata(self):
         """
-        Commonly used data about the page.
+		Comunmente usa datos sobre la página.
 
         This method should return a tuple, the first three elements of which
         are the id number of the page; the id number of the page's comments
@@ -103,9 +104,9 @@ class Page(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def history(self):
         """
-        Revision history of the page.
+		Historial de revisión de la página
 
-        Should return a sorted list of Revision named tuples.
+        Debe retornar un lista ordenada de tuplas nombrando la Revision.
         """
         pass
 
@@ -113,9 +114,9 @@ class Page(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def votes(self):
         """
-        Page votes.
+        Votos de página.
 
-        Should return a list of Vote named tuples.
+        Debe retornar una lista de tuplas nombrando Votos.
         """
         pass
 
@@ -123,9 +124,9 @@ class Page(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def tags(self):
         """
-        Page tags.
+        Etiquétas de la Página
 
-        Should return a set of strings.
+        Debe retornar un set de una cadena de texto.
         """
         pass
 
@@ -135,17 +136,17 @@ class Page(metaclass=abc.ABCMeta):
 
     @property
     def _id(self):
-        """Unique ID number of the page."""
+        """Unico número ID de la página."""
         return self._pdata[0]
 
     @pyscp.utils.cached_property
     def _thread(self):
-        """Thread object corresponding to the page's comments thread."""
+        """Objeto Thread correspondiente a las páginas de hilos de comentarios."""
         return self._wiki.Thread(self._wiki, self._pdata[1])
 
     @property
     def _raw_title(self):
-        """Title as displayed on the page."""
+        """Título como es mostrado en la página."""
         title = self._soup.find(id='page-title')
         return title.text.strip() if title else ''
 
@@ -155,7 +156,7 @@ class Page(metaclass=abc.ABCMeta):
 
     @property
     def _soup(self):
-        """BeautifulSoup of the contents of the page."""
+        """BeautifulSoup del contenido de la página."""
         return bs4.BeautifulSoup(self.html, 'lxml')
 
     ###########################################################################
@@ -164,32 +165,32 @@ class Page(metaclass=abc.ABCMeta):
 
     @property
     def html(self):
-        """HTML contents of the page."""
+        """Contendio HTML de la página."""
         return self._pdata[2]
 
     @property
     def posts(self):
-        """List of the comments made on the page."""
+        """Lista de comentarios hechos en la página."""
         return self._thread.posts
 
     @property
     def comments(self):
-        """Alias for Page.posts."""
+        """Alias para Page.posts."""
         return self._thread.posts
 
     @property
     def text(self):
-        """Plain text of the page."""
+        """Texto llano de la página."""
         return self._soup.find(id='page-content').text
 
     @property
     def wordcount(self):
-        """Number of words encountered on the page."""
+        """Número de palabras encontrados en la página."""
         return len(re.findall(r"[\w'█_-]+", self.text))
 
     @property
     def images(self):
-        """Number of images dislayed on the page."""
+        """Número de imagenes mostradas en la página."""
         # TODO: needs more work.
         return [i['src'] for i in self._soup('img')]
 
@@ -200,9 +201,9 @@ class Page(metaclass=abc.ABCMeta):
     @property
     def title(self):
         """
-        Title of the page.
+        Título de la página.
 
-        In case of SCP articles, will include the title from the 'series' page.
+        En caso de los artículos SCP, incluirá el título de la página de la 'serie.'
         """
         try:
             return '{}: {}'.format(
@@ -212,34 +213,34 @@ class Page(metaclass=abc.ABCMeta):
 
     @property
     def created(self):
-        """When was the page created."""
+        """Cuando creas la página."""
         return self.history[0].time
 
     @property
     def metadata(self):
         """
-        Return page metadata.
+        Retorna la página de metadatos
 
-        Authors in this case includes all users related to the creation
-        and subsequent maintenance of the page. The values of the dict
-        describe the user's relationship to the page.
+	Autores en este caso incluye a todos los usuarios relacionados
+	a la creación y subsecuente mantenimiento de la página. Los
+	valores en el dict describe a los usuarios relacionados con la página.
         """
         data = [i for i in self._wiki.metadata() if i.url == self.url]
         data = {i.user: i for i in data}
 
-        if 'author' not in {i.role for i in data.values()}:
-            meta = Metadata(self.url, self._raw_author, 'author', None)
+        if 'autor' not in {i.role for i in data.values()}:
+            meta = Metadata(self.url, self._raw_author, 'autor', None)
             data[self._raw_author] = meta
 
         for k, v in data.items():
-            if v.role == 'author' and not v.date:
+            if v.role == 'autor' and not v.date:
                 data[k] = v._replace(date=self.created)
 
         return data
 
     @property
     def rating(self):
-        """Rating of the page, excluding deleted accounts."""
+        """Puntaje de la página, excluyendo a los usuarios eliminados."""
         return sum(
             v.value for v in self.votes if v.user != '(account deleted)')
 
@@ -247,15 +248,15 @@ class Page(metaclass=abc.ABCMeta):
     @pyscp.utils.listify()
     def links(self):
         """
-        Other pages linked from this one.
+		Otras páginas enlazadas desde esta.
 
-        Returns an ordered list of unique urls. Off-site links or links to
-        images are not included.
+        Retorna una lista ordenada de urls unicas. Enlaces fuera del sitio o
+		enlaces a imagenes no son incluidos.
         """
         unique = set()
         for element in self._soup.select('#page-content a'):
             href = element.get('href', None)
-            if (not href or href[0] != '/' or  # bad or absolute link
+            if (not href or href[0] != '/' or  # malo o enlace absoluto
                     href[-4:] in ('.png', '.jpg', '.gif')):
                 continue
             url = self._wiki.site + href.rstrip('|')
@@ -265,7 +266,7 @@ class Page(metaclass=abc.ABCMeta):
 
     @property
     def parent(self):
-        """Parent of the current page."""
+        """Padre de la página actual."""
         if not self.html:
             return None
         breadcrumb = self._soup.select('#breadcrumbs a')
@@ -275,31 +276,31 @@ class Page(metaclass=abc.ABCMeta):
     @property
     def is_mainlist(self):
         """
-        Indicate whether the page is a mainlist scp article.
+        Indica si la página está en la lista principal de artículos SCP.
 
-        This is an scp-wiki exclusive property.
+        Esta es una propiedad exclusiva de lafundacionscp.
         """
-        if 'scp-wiki' not in self._wiki.site:
+        if 'lafundacionscp' not in self._wiki.site:
             return False
         if 'scp' not in self.tags:
             return False
         return bool(re.search(r'/scp-[0-9]{3,4}$', self.url))
 
     ###########################################################################
-    # Methods
+    # Metodos
     ###########################################################################
 
     def build_attribution_string(
             self, templates=None, group_templates=None, separator=', ',
             user_formatter=None):
         """
-        Create an attribution string based on the page's metadata.
+        Crea un string de atribución basado en los metadatos de las páginas.
 
-        This is a commonly needed operation. The result should be a nicely
+        Esta es una operación comunmente necesitada. The result should be a nicely
         formatted, human-readable description of who was and is involved with
         the page, and in what role.
         """
-        roles = 'author rewrite translator maintainer'.split()
+        roles = 'autor reescritor traductor mantenimiento'.split()
 
         if not templates:
             templates = {i: '{{user}} ({})'.format(i) for i in roles}
@@ -307,7 +308,7 @@ class Page(metaclass=abc.ABCMeta):
         items = list(self.metadata.values())
         items.sort(key=lambda x: [roles.index(x.role), x.date])
 
-        # group users in the same role on the same date together
+        # grupo de usuarios con el mismo rol en conjunto a la misma fecha == group users in the same role on the same date together
         itemdict = collections.OrderedDict()
         for i in items:
             user = user_formatter.format(i.user) if user_formatter else i.user
@@ -338,10 +339,10 @@ class Page(metaclass=abc.ABCMeta):
 
 class Thread(metaclass=abc.ABCMeta):
     """
-    Thread Abstract Base Class.
+    Clase Base de Abstracción de Hilos.
 
-    Thread objects represent individual forum threads. Most pages have a
-    corresponding comments thread, accessible via Page._thread.
+    Objetos Hilos representan hilos de foro individuales. Muchas página tienen 
+    su hilo de comentarios correspondiente, accesible via Page._thread.
     """
 
     def __init__(self, wiki, _id, title=None, description=None):
@@ -350,29 +351,29 @@ class Thread(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def posts(self):
-        """Posts in this thread."""
+        """Posts en el hilo."""
         pass
 
 
 class Wiki(metaclass=abc.ABCMeta):
     """
-    Wiki Abstract Base Class.
+    Clase Base de Abstracción de la Wiki.
 
-    Wiki objects provide wiki-wide functionality not limited to individual
-    pages or threads.
+    Objetos Wiki proveen completa funcionalidad de la wiki no limitada a páginas
+    individuales o hilos.
     """
 
     ###########################################################################
-    # Class Attributes
+    # Atributos de Clase
     ###########################################################################
 
-    # should point to the respective Page and Thread classes in each submodule.
+    # Debe apuntar a la respectivas clases Page y Thread en cada submodulo.
 
     Page = Page
     Thread = Thread
 
     ###########################################################################
-    # Special Methods
+    # Metodos Especiales
     ###########################################################################
 
     def __init__(self, site):
@@ -395,13 +396,13 @@ class Wiki(metaclass=abc.ABCMeta):
         """
         List page ownership metadata.
 
-        This method is exclusive to the scp-wiki, and is used to fine-tune
+        Este método es exclusivo de lafundacionscp, y es usado to fine-tune
         the page ownership information beyond what is possible with Wikidot.
         This allows a single page to have an author different from the user
         who created the zeroth revision of the page, or even have multiple
         users attached to the page in various roles.
         """
-        if 'scp-wiki' not in self.site:
+        if 'lafundacionscp' not in self.site:
             return []
         soup = self('attribution-metadata')._soup
         results = []
@@ -414,8 +415,8 @@ class Wiki(metaclass=abc.ABCMeta):
 
     def _update_titles(self):
         for name in (
-                'scp-series', 'scp-series-2', 'scp-series-3',
-                'joke-scps', 'scp-ex', 'archived-scps'):
+                'serie-scp-i', 'serie-scp-ii', 'serie-scp-iii', 'serie-scp-iv', 'serie-scp-es'
+                'scps-humoristicos', 'scp-ex', 'scps-archivados'):
             page = self(name)
             try:
                 soup = page._soup
@@ -427,8 +428,8 @@ class Wiki(metaclass=abc.ABCMeta):
     @pyscp.utils.log_errors(logger=log.error)
     @functools.lru_cache(maxsize=1)
     def titles(self):
-        """Dict of url/title pairs for scp articles."""
-        if 'scp-wiki' not in self.site:
+        """Diccionario de pareja url/título para artículos SCP."""
+        if 'lafundacionscp' not in self.site:
             return {}
 
         self._update_titles()
@@ -450,28 +451,28 @@ class Wiki(metaclass=abc.ABCMeta):
             except (ValueError, TypeError):
                 continue
 
-            if title != '[ACCESS DENIED]':
+            if title != '[ACCESO DENEGADO]':
                 url2 = self.site + '/' + skip.lower()
                 titles[url1] = titles[url2] = title
 
         return titles
 
     def list_pages(self, **kwargs):
-        """Return pages matching the specified criteria."""
+        """Retorna páginas relacionadas al criterio especificado."""
         pages = self._list_pages_parsed(**kwargs)
-        author = kwargs.pop('author', None)
+        author = kwargs.pop('autor', None)
         if not author:
-            # if 'author' isn't specified, there's no need to check rewrites
+            # si 'autor' no es especificado, there's no need to check rewrites
             return pages
         include, exclude = set(), set()
         for meta in self.metadata():
             if meta.user == author:
-                # if username matches, include regardless of type
+                # si empareja el nombre de usuario, incluyelo sin tener en cuenta el tipo
                 include.add(meta.url)
-            elif meta.role == 'author':
-                # exclude only if override type is author.
-                # if url has author and rewrite author,
-                # it will appear in list_pages for both.
+            elif meta.role == 'autor':
+                # excluye solo si la reescritura de tipo es autor. 
+                # si la url tiene al autor y al reescritor,
+                # ambos apareceran en list_pages.
                 exclude.add(meta.url)
         urls = {p.url for p in pages} | include - exclude
         # if no other options beside author were specified,
@@ -484,13 +485,14 @@ class Wiki(metaclass=abc.ABCMeta):
         return [p for p in pages if p.url in urls]
 
 ###############################################################################
-# Named Tuple Containers
+# Contenedores de Tuplas Nombradas
 ###############################################################################
 
 nt = collections.namedtuple
 Revision = nt('Revision', 'id number user time comment')
 Vote = nt('Vote', 'user value')
 Post = nt('Post', 'id title content user time parent')
+File = nt('File', 'url name filetype size')										   
 Metadata = nt('Metadata', 'url user role date')
 Category = nt('Category', 'id title description size')
 Image = nt('Image', 'url source status notes data')
