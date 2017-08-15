@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 """
-Snapshot access classes.
+Clases de acceso a Snapshot.
 
-This module contains the classes that facilitate information extraction
-and communication with the sqlite Snapshots.
+Este módulo contiene las clases para facilitar la extracción de información
+y comunicación con el sqlite Snapshots.
 """
 
 ###############################################################################
-# Module Imports
+# Modulos Importados
 ###############################################################################
 
 import bs4
@@ -24,7 +24,7 @@ import requests
 from pyscp import core, orm, utils
 
 ###############################################################################
-# Global Constants And Variables
+# Constantes Globales Y Variables
 ###############################################################################
 
 log = logging.getLogger(__name__)
@@ -33,35 +33,35 @@ log = logging.getLogger(__name__)
 
 
 class Page(core.Page):
-    """Page object."""
+    """Objeto Page."""
 
     ###########################################################################
-    # Internal Methods
+    # Métodos Internos
     ###########################################################################
 
     def _query(self, ptable, stable='User'):
-        """Generate SQL queries used to retrieve data."""
+        """Genera consultas SQL usando los datos recabados."""
         pt, st = [getattr(orm, i) for i in (ptable, stable)]
         return pt.select(pt, st.name).join(st).where(pt.page == self._id)
 
     @utils.cached_property
     def _pdata(self):
-        """Preload the ids and contents of the page."""
+        """#preload Precarga las id's y el contenido de la página."""
         pdata = orm.Page.get(orm.Page.url == self.url)
         return pdata.id, pdata._data['thread'], pdata.html
 
     ###########################################################################
-    # Properties
+    # Propiedades
     ###########################################################################
 
     @property
     def html(self):
-        """Return HTML contents of the page."""
+        """Retorna el contenido HTML de la página."""
         return self._pdata[2]
 
     @utils.cached_property
     def history(self):
-        """Return the revisions of the page."""
+        """Retorna las revisiones de la página."""
         revs = self._query('Revision')
         revs = sorted(revs, key=lambda x: x.number)
         return [core.Revision(
@@ -70,22 +70,22 @@ class Page(core.Page):
 
     @utils.cached_property
     def votes(self):
-        """Return all votes made on the page."""
+        """Retorna todos los votos hechos en la página."""
         return [core.Vote(v.user.name, v.value)
                 for v in self._query('Vote')]
 
     @utils.cached_property
     def tags(self):
-        """Return the set of tags with which the page is tagged."""
+        """Retorna el juego de etiquétas con las que la página fue etiquetada."""
         return {pt.tag.name for pt in self._query('PageTag', 'Tag')}
 
 
 class Thread(core.Thread):
-    """Discussion/forum thread."""
+    """Hilos de/l Discusión/foro."""
 
     @utils.cached_property
     def posts(self):
-        """Post objects belonging to this thread."""
+        """Objetos Post pertenecientes a este hilo."""
         fp = orm.ForumPost
         us = orm.User
         query = fp.select(fp, us.name).join(us).where(fp.thread == self._id)
@@ -96,18 +96,18 @@ class Thread(core.Thread):
 
 
 class Wiki(core.Wiki):
-    """Snapshot of a Wikidot website."""
+    """Snapshot de un sitio web Wikidot."""
 
     Page = Page
     Thread = Thread
     # Tautology = Tautology
 
     ###########################################################################
-    # Special Methods
+    # Métodos Especiales
     ###########################################################################
 
     def __init__(self, site, dbpath):
-        """Create wiki instance."""
+        """Crea un instancia wiki."""
         super().__init__(site)
         if not pathlib.Path(dbpath).exists():
             raise FileNotFoundError(dbpath)
@@ -115,7 +115,7 @@ class Wiki(core.Wiki):
         orm.connect(dbpath)
 
     def __repr__(self):
-        """Pretty-print current instance."""
+        """Impresión bonita en la instancia actual."""
         return '{}.{}({}, {})'.format(
             self.__module__,
             self.__class__.__qualname__,
@@ -123,7 +123,7 @@ class Wiki(core.Wiki):
             repr(self.dbpath))
 
     ###########################################################################
-    # Internal Methods
+    # Métodos Internos
     ###########################################################################
 
     @staticmethod
@@ -176,12 +176,12 @@ class Wiki(core.Wiki):
         return map(self, [p.url for p in query])
 
     ###########################################################################
-    # SCP-Wiki Specific Methods
+    # Métodos Específicos Para La Wiki SCP
     ###########################################################################
 
     @functools.lru_cache(maxsize=1)
     def list_images(self):
-        """Image metadata."""
+        """Metadatos de imagen."""
         query = (
             orm.Image.select(orm.Image, orm.ImageStatus.name)
             .join(orm.ImageStatus))
@@ -210,19 +210,19 @@ class SnapshotCreator:
     """
 
     def __init__(self, dbpath):
-        """Create an instance."""
+        """Crea una instancia."""
         if pathlib.Path(dbpath).exists():
             raise FileExistsError(dbpath)
         orm.connect(dbpath)
         self.pool = concurrent.futures.ThreadPoolExecutor(max_workers=20)
 
     def take_snapshot(self, wiki, forums=False):
-        """Take new snapshot."""
+        """Asume un nuevo snapshot."""
         self.wiki = wiki
         self._save_all_pages()
         if forums:
             self._save_forums()
-        if 'scp-wiki' in self.wiki.site:
+        if 'lafundacionscp' in self.wiki.site:
             self._save_meta()
         orm.queue.join()
         self._save_cache()
@@ -230,13 +230,13 @@ class SnapshotCreator:
         log.info('Snapshot succesfully taken.')
 
     def _save_all_pages(self):
-        """Iterate over the site pages, call _save_page for each."""
+        """Itera sobre las páginas del sitio, llama a _save_page para cada uno."""
         orm.create_tables(
             'Page', 'Revision', 'Vote', 'ForumPost',
             'PageTag', 'ForumThread', 'User', 'Tag')
         count = next(
             self.wiki.list_pages(body='total', limit=1))._body['total']
-        bar = utils.ProgressBar('SAVING PAGES'.ljust(20), int(count))
+        bar = utils.ProgressBar('Guardando Página'.ljust(20), int(count))
         bar.start()
         for _ in self.pool.map(self._save_page, self.wiki.list_pages()):
             bar.value += 1
@@ -244,7 +244,7 @@ class SnapshotCreator:
 
     @utils.ignore(requests.HTTPError)
     def _save_page(self, page):
-        """Download contents, revisions, votes and discussion of the page."""
+        """Descarga contenidos, revisiones, votos y discusiones de la página."""
         orm.Page.create(
             id=page._id, url=page.url, thread=page._thread._id, html=page.html)
 
@@ -263,7 +263,7 @@ class SnapshotCreator:
         self._save_thread(page._thread)
 
     def _save_forums(self):
-        """Download and save standalone forum threads."""
+        """Descarga y salva los hilos autónomos del foro."""
         orm.create_tables(
             'ForumPost', 'ForumThread', 'ForumCategory', 'User')
         cats = self.wiki.list_categories()
@@ -273,7 +273,7 @@ class SnapshotCreator:
             title=c.title,
             description=c.description) for c in cats)
         total_size = sum(c.size for c in cats)
-        bar = utils.ProgressBar('SAVING FORUM THREADS', total_size)
+        bar = utils.ProgressBar('GUARDANDO HILO DEL FORO', total_size)
         bar.start()
         for cat in cats:
             threads = set(self.wiki.list_threads(cat.id))
@@ -294,10 +294,10 @@ class SnapshotCreator:
         orm.create_tables(
             'Image', 'ImageStatus')
         licenses = {
-            'PERMISSION GRANTED', 'BY-NC-SA CC', 'BY-SA CC', 'PUBLIC DOMAIN'}
+            'PERMISO GARANTIZÁDO', 'BY-NC-SA CC', 'BY-SA CC', 'DOMINIO PÚBLICO'}
         images = [i for i in self.wiki.list_images() if i.status in licenses]
         self.ibar = utils.ProgressBar(
-            'SAVING IMAGES'.ljust(20), len(images))
+            'GUARDANDO IMÁGEN'.ljust(20), len(images))
         self.ibar.start()
         data = list(self.pool.map(self._save_image, images))
         self.ibar.stop()
@@ -310,7 +310,7 @@ class SnapshotCreator:
     def _save_image(self, image):
         self.ibar.value += 1
         if not image.source:
-            log.info('Image source not specified: ' + image.url)
+            log.info('Dirección de la imágen no especificado: ' + image.url)
             return
         return self.wiki.req.get(image.url, allow_redirects=True).content
 
