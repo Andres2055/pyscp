@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ###############################################################################
-# Module Imports
+# Módulos Importados
 ###############################################################################
 
 import logging
@@ -13,11 +13,11 @@ import functools
 import inspect
 
 ###############################################################################
-# Decorators
+# Decoradores
 ###############################################################################
 
 ###############################################################################
-# Decorator decorator is a simplified version of the code from the funcy lib.
+# Decorador decorador es una versión simple del código de la libreria funcy.
 # https://github.com/Suor/funcy
 ###############################################################################
 
