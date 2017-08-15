@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ###############################################################################
-# Module Imports
+# Modulos Importados
 ###############################################################################
 
 import concurrent.futures
@@ -12,7 +12,7 @@ import queue
 from itertools import islice
 
 ###############################################################################
-# Global Constants And Variables
+# Constantes Globales Y Variables
 ###############################################################################
 
 log = logging.getLogger('pyscp.orm')
@@ -25,7 +25,7 @@ def queue_execution(fn, args=(), kw={}):
     pool.submit(async_write)
 
 ###############################################################################
-# Database ORM Classes
+# Clases de la Base de Datos del ORM
 ###############################################################################
 
 db = peewee.Proxy()
@@ -149,7 +149,7 @@ class Image(BaseModel):
     notes = peewee.TextField(null=True)
 
 ###############################################################################
-# Helper Functions
+# Funciones de Ayuda
 ###############################################################################
 
 
